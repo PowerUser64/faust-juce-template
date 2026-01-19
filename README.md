@@ -1,9 +1,3 @@
-# DISCLAIMER
-
-Here be dragons!
-
-This project was written by opencode and claude opus 4.5. Its purpose is to get out of the way and let you synthesizers with Faust, not to be a research project.
-
 # Faust + JUCE Plugin Template
 
 A [cookiecutter](https://github.com/cookiecutter/cookiecutter) template for creating audio plugins using **Faust** and **JUCE**.
@@ -15,6 +9,7 @@ A [cookiecutter](https://github.com/cookiecutter/cookiecutter) template for crea
 - **Optional JACK app** - Linux JACK test application
 - **Polyphonic synth support** - Standard Faust MIDI/polyphony conventions
 - **Modern C++17** - Uses JUCE 8.x
+- **Automatic setup** - Post-generation hook configures git submodules and Faust
 
 ## Requirements
 
@@ -22,6 +17,7 @@ A [cookiecutter](https://github.com/cookiecutter/cookiecutter) template for crea
 - Ninja (recommended) or Make
 - Faust compiler (`faust` in PATH)
 - C++17 compiler (GCC, Clang, MSVC)
+- Git
 - Python 3.x with cookiecutter: `pip install cookiecutter`
 
 ## Usage
@@ -33,6 +29,12 @@ cookiecutter /path/to/faust-juce-template
 # Or from a git repo
 cookiecutter gh:yourusername/faust-juce-template
 ```
+
+The post-generation hook will automatically:
+1. Initialize a git repository
+2. Add JUCE as a submodule (checked out to v8.0.4)
+3. Add clap-juce-extensions as a submodule
+4. Copy Faust architecture files (if `faust` is in PATH)
 
 You'll be prompted for:
 
@@ -53,22 +55,19 @@ You'll be prompted for:
 
 ## After Generation
 
+If Faust is installed and in your PATH, everything is set up automatically:
+
 ```bash
 cd my-synth
-
-# Initialize git and submodules
-git init
-git submodule add https://github.com/juce-framework/JUCE.git external/JUCE
-git submodule add https://github.com/free-audio/clap-juce-extensions.git external/clap-juce-extensions
-git submodule update --init --recursive
-
-# Copy Faust architecture files (required)
-# You need to copy or symlink Faust's architecture directory
-cp -r /path/to/faust/architecture external/faust/
-
-# Build
 cmake -S . -B build -G Ninja
 cmake --build build -j
+```
+
+If Faust architecture files weren't copied automatically, you'll need to do it manually:
+
+```bash
+mkdir -p external/faust
+cp -r $(faust --archdir) external/faust/architecture
 ```
 
 ## Project Structure
@@ -80,11 +79,11 @@ my-synth/
 ├── main.dsp                 # Your DSP code goes here
 ├── AGENTS.md                # Notes for AI agents / developers
 ├── .gitignore
-└── external/                # Git submodules (added after generation)
-    ├── JUCE/
-    ├── clap-juce-extensions/
+└── external/                # Dependencies (set up by post-gen hook)
+    ├── JUCE/                # Git submodule
+    ├── clap-juce-extensions/ # Git submodule
     └── faust/
-        └── architecture/    # Faust architecture files
+        └── architecture/    # Copied from system Faust installation
 ```
 
 ## Customization

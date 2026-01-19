@@ -3,22 +3,35 @@
 Post-generation hook for faust-juce-template.
 
 This script runs after cookiecutter generates the project.
-It initializes git and sets up submodules.
+It initializes git, sets up submodules, and copies Faust architecture files.
 """
 
 import os
+import shutil
 import subprocess
 import sys
 
 
-def run_command(cmd, check=True):
+def run_command(cmd, check=True, capture=True):
     """Run a shell command and optionally check for errors."""
     print(f"  Running: {' '.join(cmd)}")
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    result = subprocess.run(cmd, capture_output=capture, text=True)
     if check and result.returncode != 0:
-        print(f"  Warning: {result.stderr.strip()}")
+        if capture:
+            print(f"  Warning: {result.stderr.strip()}")
         return False
-    return True
+    return result if capture else True
+
+
+def get_faust_archdir():
+    """Get the Faust architecture directory from the faust command."""
+    try:
+        result = subprocess.run(
+            ["faust", "--archdir"], capture_output=True, text=True, check=True
+        )
+        return result.stdout.strip()
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return None
 
 
 def main():
@@ -64,29 +77,59 @@ def main():
     print("\n  Initializing nested submodules...")
     run_command(["git", "submodule", "update", "--init", "--recursive"], check=False)
 
-    print(f"""
-{"=" * 60}
-Project '{project_slug}' created successfully!
-{"=" * 60}
+    # Copy Faust architecture files
+    print("\nSetting up Faust architecture files...")
+    faust_archdir = get_faust_archdir()
+    faust_dest = os.path.join("external", "faust", "architecture")
 
-Next steps:
+    if faust_archdir and os.path.isdir(faust_archdir):
+        print(f"  Found Faust architecture at: {faust_archdir}")
+        print(f"  Copying to: {faust_dest}")
+        os.makedirs(os.path.dirname(faust_dest), exist_ok=True)
+        if os.path.exists(faust_dest):
+            shutil.rmtree(faust_dest)
+        shutil.copytree(faust_archdir, faust_dest)
+        print("  Faust architecture files copied successfully!")
+        faust_setup_complete = True
+    else:
+        print("  Warning: Could not find Faust installation.")
+        print("  You will need to manually copy the architecture files.")
+        faust_setup_complete = False
 
-1. Copy Faust architecture files:
-   mkdir -p external/faust
-   cp -r /path/to/faust/architecture external/faust/
+    # Print completion message
+    print(f"\n{'=' * 60}")
+    print(f"Project '{project_slug}' created successfully!")
+    print(f"{'=' * 60}")
 
-   Or if you have Faust installed:
-   cp -r $(faust --archdir) external/faust/architecture
+    if faust_setup_complete:
+        print(f"""
+All dependencies are set up! You can now build:
 
-2. Build the project:
-   cmake -S . -B build -G Ninja
-   cmake --build build -j
+    cd {project_slug}
+    cmake -S . -B build -G Ninja
+    cmake --build build -j
 
-3. Test it:
-   ./build/{project_slug}_artefacts/Debug/Standalone/{project_slug}
+Then test it:
 
-Happy coding!
+    ./build/{project_slug}_artefacts/Debug/Standalone/{project_slug}
 """)
+    else:
+        print(f"""
+Almost done! You need to copy Faust architecture files:
+
+    mkdir -p external/faust
+    cp -r /path/to/faust/architecture external/faust/
+
+    # Or if faust is installed elsewhere:
+    cp -r $(faust --archdir) external/faust/architecture
+
+Then build:
+
+    cmake -S . -B build -G Ninja
+    cmake --build build -j
+""")
+
+    print("Happy coding!\n")
 
 
 if __name__ == "__main__":
