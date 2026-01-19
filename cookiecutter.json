@@ -1,0 +1,17 @@
+{
+    "project_name": "My Synth",
+    "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '-').replace('_', '-') }}",
+    "project_description": "A Faust synthesizer plugin",
+    "author_name": "Your Name",
+    "author_short": "{{ cookiecutter.author_name.split()[0][:3].upper() if ' ' in cookiecutter.author_name else cookiecutter.author_name[:3].upper() }}",
+    "clap_vendor": "{{ cookiecutter.author_name.lower().replace(' ', '') }}",
+    "clap_id": "audio.{{ cookiecutter.clap_vendor }}.{{ cookiecutter.project_slug.replace('-', '') }}",
+    "plugin_code": "{{ (cookiecutter.project_slug.replace('-', '')[:3].capitalize() + '1')[:4] }}",
+    "manufacturer_code": "{{ cookiecutter.author_short + 'a' }}",
+    "nvoices": "16",
+    "is_synth": ["true", "false"],
+    "include_jack_app": ["true", "false"],
+    "_juce_repo": "https://github.com/juce-framework/JUCE.git",
+    "_juce_tag": "8.0.4",
+    "_clap_ext_repo": "https://github.com/free-audio/clap-juce-extensions.git"
+}
