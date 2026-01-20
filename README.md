@@ -1,6 +1,13 @@
+# DISCLAIMER
+
+Here be dragons!
+
+- This project was written by opencode and claude opus 4.5.
+- The purpose of this is to get out of the way and let you write synthesizers with Faust, NOT to be a research project.
+
 # Faust + JUCE Plugin Template
 
-A [cookiecutter](https://github.com/cookiecutter/cookiecutter) template for creating audio plugins using **Faust** and **JUCE**.
+A lightweight [cookiecutter](https://github.com/cookiecutter/cookiecutter) template for creating audio plugins using Faust and JUCE.
 
 ## Features
 
