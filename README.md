@@ -34,7 +34,7 @@ A lightweight [cookiecutter](https://github.com/cookiecutter/cookiecutter) templ
 cookiecutter /path/to/faust-juce-template
 
 # Or from a git repo
-cookiecutter gh:yourusername/faust-juce-template
+cookiecutter gh:PowerUser64/faust-juce-template
 ```
 
 The post-generation hook will automatically:
