@@ -30,7 +30,7 @@ juce_add_plugin({{ cookiecutter.project_slug }}
 
 juce_generate_juce_header({{ cookiecutter.project_slug }})
 
-set(FAUST_DSP "${CMAKE_CURRENT_SOURCE_DIR}/{{ cookiecutter.project_slug }}.dsp")
+set(FAUST_DSP "${CMAKE_CURRENT_SOURCE_DIR}/meta.dsp")
 set(FAUST_MAIN_DSP "${CMAKE_CURRENT_SOURCE_DIR}/main.dsp")
 set(FAUST_ARCH_JUCE "${CMAKE_CURRENT_SOURCE_DIR}/external/faust/architecture/juce/juce-plugin.cpp")
 

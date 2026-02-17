@@ -39,6 +39,7 @@ def main():
     juce_repo = "{{ cookiecutter._juce_repo }}"
     juce_tag = "{{ cookiecutter._juce_tag }}"
     clap_repo = "{{ cookiecutter._clap_ext_repo }}"
+    faust_repo = "{{ cookiecutter._faust_repo }}"
 
     print(f"\n{'=' * 60}")
     print(f"Setting up {project_slug}")
@@ -60,7 +61,7 @@ def main():
     # Add JUCE submodule
     print(f"\n  Adding JUCE from {juce_repo}...")
     if run_command(
-        ["git", "submodule", "add", juce_repo, "external/JUCE"], check=False
+        ["git", "submodule", "add", "--depth=1", juce_repo, "external/JUCE"], check=False
     ):
         # Checkout specific tag
         print(f"  Checking out JUCE {juce_tag}...")
@@ -69,7 +70,14 @@ def main():
     # Add clap-juce-extensions submodule
     print(f"\n  Adding clap-juce-extensions from {clap_repo}...")
     run_command(
-        ["git", "submodule", "add", clap_repo, "external/clap-juce-extensions"],
+        ["git", "submodule", "add", "--depth=1", clap_repo, "external/clap-juce-extensions"],
+        check=False,
+    )
+
+    # Add faust as a submodule
+    print(f"\n  Adding faust from {faust_repo}...")
+    run_command(
+        ["git", "submodule", "add", "--depth=1", faust_repo, "external/faust"],
         check=False,
     )
 
@@ -77,56 +85,20 @@ def main():
     print("\n  Initializing nested submodules...")
     run_command(["git", "submodule", "update", "--init", "--recursive"], check=False)
 
-    # Copy Faust architecture files
-    print("\nSetting up Faust architecture files...")
-    faust_archdir = get_faust_archdir()
-    faust_dest = os.path.join("external", "faust", "architecture")
-
-    if faust_archdir and os.path.isdir(faust_archdir):
-        print(f"  Found Faust architecture at: {faust_archdir}")
-        print(f"  Copying to: {faust_dest}")
-        os.makedirs(os.path.dirname(faust_dest), exist_ok=True)
-        if os.path.exists(faust_dest):
-            shutil.rmtree(faust_dest)
-        shutil.copytree(faust_archdir, faust_dest)
-        print("  Faust architecture files copied successfully!")
-        faust_setup_complete = True
-    else:
-        print("  Warning: Could not find Faust installation.")
-        print("  You will need to manually copy the architecture files.")
-        faust_setup_complete = False
-
     # Print completion message
     print(f"\n{'=' * 60}")
     print(f"Project '{project_slug}' created successfully!")
     print(f"{'=' * 60}")
 
-    if faust_setup_complete:
-        print(f"""
+    print(f"""
 All dependencies are set up! You can now build:
 
     cd {project_slug}
-    cmake -S . -B build -G Ninja
-    cmake --build build -j
+    just build
 
 Then test it:
 
-    ./build/{project_slug}_artefacts/Debug/Standalone/{project_slug}
-""")
-    else:
-        print(f"""
-Almost done! You need to copy Faust architecture files:
-
-    mkdir -p external/faust
-    cp -r /path/to/faust/architecture external/faust/
-
-    # Or if faust is installed elsewhere:
-    cp -r $(faust --archdir) external/faust/architecture
-
-Then build:
-
-    cmake -S . -B build -G Ninja
-    cmake --build build -j
+    just run
 """)
 
     print("Happy coding!\n")

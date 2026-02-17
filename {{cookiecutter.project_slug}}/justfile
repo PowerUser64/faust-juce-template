@@ -1,0 +1,68 @@
+# Default value for CMAKE_BUILD_TYPE
+default_build_type := "Release"
+
+# Tell cmake to use parallel execution of <number of cpu cores> minus this number
+parallel_build_ignore_cpus := "1"
+
+# Compile (default)
+[positional-arguments]
+build type=default_build_type:
+   #!/bin/sh
+
+   # Check if we haven't configured yet
+   if ! [ -d "./ignore/build" ]; then
+      # run configure step
+      just _echo_do just configure "$1"
+   fi
+
+   # build with parallelism based on the number of cpu cores
+   just _echo_do cmake --build ignore/build --parallel="$(nproc --ignore='{{ "{{" }}parallel_build_ignore_cpus{{ "}}" }}')"
+
+
+# Configure build system (Release or Debug, default is Debug)
+[positional-arguments]
+configure type=default_build_type *cmake_args:
+   #!/bin/sh
+
+   just _echo_do cmake -B ignore/build -GNinja -DCMAKE_BUILD_TYPE="$1" "${@:2}"
+
+
+# Run
+[positional-arguments]
+run type=default_build_type *run_args:
+   #!/bin/sh
+
+   # Check if we haven't compiled yet
+   exe=./ignore/build/'{{ cookiecutter.project_slug }}'_artefacts/"$1"/Standalone/'{{ cookiecutter.project_name }}'
+   if ! [ -f "$exe" ]; then
+      just _echo_do just build "$1"
+   fi
+
+   # Run the program
+   shift
+   just _echo_do "$exe" "$@"
+
+
+# Clean the build files
+clean:
+   rm -r ignore/build
+
+
+##
+## Utilities
+##
+
+# List available actions
+list:
+   @just --list --unsorted
+
+
+# Simple utility to print out what's being executed before running it, matching just's default output format
+[positional-arguments]
+_echo_do *exec:
+   #!/bin/bash
+   echo -en '\e[1m' >&2 # style: bold
+   echo -n  "$@"     >&2
+   echo -e  '\e[0m'  >&2 # style: reset
+   "$@"
+

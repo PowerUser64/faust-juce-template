@@ -1,7 +1,7 @@
 {
-    "project_name": "My Synth",
+    "project_name": "My Faust Plugin",
     "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '-').replace('_', '-') }}",
-    "project_description": "A Faust synthesizer plugin",
+    "project_description": "A Faust+JUCE audio plugin",
     "author_name": "Your Name",
     "author_short": "{{ cookiecutter.author_name.split()[0][:3].upper() if ' ' in cookiecutter.author_name else cookiecutter.author_name[:3].upper() }}",
     "clap_vendor": "{{ cookiecutter.author_name.lower().replace(' ', '') }}",
@@ -12,6 +12,7 @@
     "is_synth": ["true", "false"],
     "include_jack_app": ["true", "false"],
     "_juce_repo": "https://github.com/juce-framework/JUCE.git",
-    "_juce_tag": "8.0.4",
-    "_clap_ext_repo": "https://github.com/free-audio/clap-juce-extensions.git"
+    "_juce_tag": "8.0.12",
+    "_clap_ext_repo": "https://github.com/free-audio/clap-juce-extensions.git",
+    "_faust_repo": "https://github.com/grame-cncm/faust"
 }

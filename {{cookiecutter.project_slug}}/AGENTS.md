@@ -62,7 +62,7 @@ The Faust code is written to match Faust's standard polyphony conventions:
 
 Important: `freq` must *not* be reused as a helper function name in the DSP, otherwise Faust will error with `multiple definitions of symbol 'freq'`.
 
-The wrapper DSP `{{ cookiecutter.project_slug }}.dsp` explicitly enables Faust MIDI + polyphony via metadata:
+The wrapper DSP `meta.dsp` explicitly enables Faust MIDI + polyphony via metadata:
 
 - `declare options "[midi:on][nvoices:{{ cookiecutter.nvoices }}]";`
 {% endif %}

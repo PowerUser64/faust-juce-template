@@ -1,0 +1,12 @@
+[submodule "external/JUCE"]
+	path = external/JUCE
+	url = {{ cookiecutter._juce_repo }}
+	shallow = true
+[submodule "external/clap-juce-extensions"]
+	path = external/clap-juce-extensions
+	url = {{ cookiecutter._clap_ext_repo }}
+	shallow = true
+[submodule "external/faust"]
+	path = external/faust
+	url = {{ cookiecutter._faust_repo }}
+	shallow = true
